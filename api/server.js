@@ -12,8 +12,22 @@ app.get("/", (req, res) => {
 
 app.post("/", (req, res) => {
   const server = req.body;
-  server.timestamp = Date.now();
-  servers.push(server);
+  
+  // Check if server already exists
+  let existing = servers.find(s => s.id === server.id);
+  if (existing) {
+    // Update players/maxPlayers
+    existing.players = server.players;
+    existing.maxPlayers = server.maxPlayers;
+    // Update highestValue if the new value is higher
+    if (server.highestValue and server.highestValue > (existing.highestValue || 0)) {
+      existing.highestValue = server.highestValue;
+    }
+  } else {
+    server.highestValue = server.highestValue || 0;
+    servers.push(server);
+  }
+
   res.json({ success: true });
 });
 
